@@ -6,7 +6,6 @@ from matplotlib import pyplot as plt
 data = pd.read_csv("train.csv")
 data = np.array(data)
 m,n = data.shape #m = number of pictures, n = numbers per row (answer + 784 pixels)
-print(data.shape)
 np.random.shuffle(data) #mix up the order so the split below is random
 
 #Surprise test: 1000 pictures the network never trains on, to check it really learned
@@ -25,11 +24,11 @@ X_train = data_train[1:n] / 255. #the pixels, shrunk from 0-255 to 0-1
 #Make the starting weights (W) and biases (b) for both layers as random numbers between -0.5 and 0.5
 #W = how much each neuron cares about each of its inputs, b = each neuron's starting mood
 #Each W is shaped (neurons in this layer, inputs coming in)
-def initParams():
-    W1 = np.random.rand(64, 784) - 0.5
-    b1 = np.random.rand(64, 1) - 0.5
-    W2 = np.random.rand(10, 64) - 0.5 # hidden layer
-    b2 = np.random.rand(10, 1) - 0.5 #hidden layer
+def initParams(size):
+    W1 = np.random.rand(size, 784) - 0.5
+    b1 = np.random.rand(size, 1) - 0.5
+    W2 = np.random.rand(10, size) - 0.5 
+    b2 = np.random.rand(10, 1) - 0.5 
     return W1, b1, W2, b2
 
 #If Z is greater than 0 return Z if less than 0 return 0
@@ -42,7 +41,7 @@ def softmax(Z):
 
 #Turn each answer into the "perfect" percentages, e.g. 3 -> [0,0,0,1,0,0,0,0,0,0]
 def oneHot(Y):
-    oneHotY = np.zeros((Y.size, Y.max() + 1)) #a grid of zeros: one row per picture, one column per digit
+    oneHotY = np.zeros((Y.size, 10)) #a grid of zeros: one row per picture, one column per digit
     oneHotY[np.arange(Y.size), Y] = 1 #put a 1 in each picture's correct digit spot
     oneHotY = oneHotY.T #flip it so each picture is a column, matching A2
     return oneHotY
@@ -95,17 +94,23 @@ def get_accuracy(predictions, Y):
     return np.sum(predictions == Y) / Y.size
 
 #Training: start with random weights, then repeat guess -> blame -> fix over and over
-def gradient_descent(X, Y, iterations, alpha):
-    W1, b1, W2, b2 = initParams()
+def gradient_descent(X, Y, iterations, alpha, size):
+    W1, b1, W2, b2 = initParams(size)
     for i in range(iterations):
-        Z1,A1,Z2,A2 = forwardProp(W1, b1, W2, b2, X) #guess
-        dW1, db1, dW2, db2 = backwardsProp(Z1, A1, Z2, A2, W2, X, Y) #blame
-        W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha) #fix
-        if i%100==0: #every 100 rounds, show how it's doing
-            print("iteration:", i)
-            print("Accuracy:", get_accuracy(get_predictions(A2), Y))
+        for c in range(0, X.shape[1], 64):
+            chunkX = X[:,c:c+64]
+            chunkY = Y[c:c+64]
+            Z1,A1,Z2,A2 = forwardProp(W1, b1, W2, b2, chunkX) #guess
+            dW1, db1, dW2, db2 = backwardsProp(Z1, A1, Z2, A2, W2, chunkX, chunkY) #blame
+            W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha) #fix
+        _,_,_,A2 = forwardProp(W1, b1, W2, b2, X)
+        print("iteration:", i)
+        print("Accuracy:", get_accuracy(get_predictions(A2), Y))
     return W1, b1, W2, b2
 
 #Only train when this file is run directly, not when visualise.py imports it
 if __name__ == "__main__":
-    W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 500, 0.1)
+    W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, 0.1, 10)
+    _, _, _, A2_dev = forwardProp(W1, b1, W2, b2, X_dev)
+    dev_predictions = get_predictions(A2_dev)
+    print("Dev accuracy:", np.sum(dev_predictions == Y_dev) / Y_dev.size)

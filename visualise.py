@@ -5,8 +5,8 @@ from main import (X_train, Y_train, X_dev, Y_dev, initParams, forwardProp,
                   backwardsProp, update_params, get_predictions)
 
 #Same as gradient_descent in main.py, but also records accuracy every iteration
-def train_with_history(X, Y, iterations, alpha):
-    W1, b1, W2, b2 = initParams()
+def train_with_history(X, Y, iterations, alpha, size):
+    W1, b1, W2, b2 = initParams(size)
     accuracies = []
     for i in range(iterations):
         Z1,A1,Z2,A2 = forwardProp(W1, b1, W2, b2, X)
@@ -17,7 +17,7 @@ def train_with_history(X, Y, iterations, alpha):
             print("iteration:", i, "Accuracy:", accuracies[-1])
     return W1, b1, W2, b2, accuracies
 
-W1,b1,W2,b2,accuracies = train_with_history(X_train, Y_train, 500, 0.1)
+W1,b1,W2,b2,accuracies = train_with_history(X_train, Y_train, 500, 0.1, 64)
 
 _, _, _, A2_dev = forwardProp(W1, b1, W2, b2, X_dev)
 dev_predictions = get_predictions(A2_dev)
