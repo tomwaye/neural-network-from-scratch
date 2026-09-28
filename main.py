@@ -97,9 +97,12 @@ def get_accuracy(predictions, Y):
 def gradient_descent(X, Y, iterations, alpha, size):
     W1, b1, W2, b2 = initParams(size)
     for i in range(iterations):
+        shuffled_index = np.random.permutation(X.shape[1])
+        shuffledX = X[:,shuffled_index]
+        shuffledY = Y[shuffled_index]
         for c in range(0, X.shape[1], 64):
-            chunkX = X[:,c:c+64]
-            chunkY = Y[c:c+64]
+            chunkX = shuffledX[:,c:c+64]
+            chunkY = shuffledY[c:c+64]
             Z1,A1,Z2,A2 = forwardProp(W1, b1, W2, b2, chunkX) #guess
             dW1, db1, dW2, db2 = backwardsProp(Z1, A1, Z2, A2, W2, chunkX, chunkY) #blame
             W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, alpha) #fix
@@ -110,7 +113,7 @@ def gradient_descent(X, Y, iterations, alpha, size):
 
 #Only train when this file is run directly, not when visualise.py imports it
 if __name__ == "__main__":
-    W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, 0.1, 10)
+    W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 50, 0.1, 64)
     _, _, _, A2_dev = forwardProp(W1, b1, W2, b2, X_dev)
     dev_predictions = get_predictions(A2_dev)
     print("Dev accuracy:", np.sum(dev_predictions == Y_dev) / Y_dev.size)
