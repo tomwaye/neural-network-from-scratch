@@ -51,4 +51,3 @@ The weights start as random noise. Through repeated training they become stencil
    ```bash
    python visualise.py
    ```
-   `visualise.py` still trains with the original full-batch method (500 iterations), so its accuracy is lower than `main.py`'s.
