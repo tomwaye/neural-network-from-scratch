@@ -1,6 +1,6 @@
 # Neural Network From Scratch
 
-A two-layer neural network that recognises handwritten digits (0–9), written using only NumPy — no TensorFlow or PyTorch. Every step (forward propagation, backpropagation and gradient descent) is implemented by hand.
+A two-layer neural network that recognises handwritten digits (0–9), written using only NumPy. Every step (forward propagation, backpropagation and gradient descent) is implemented by hand.
 
 After 500 training iterations it reaches about **84% accuracy** on 1,000 images it never trained on.
 
