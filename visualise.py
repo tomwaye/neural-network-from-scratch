@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from main import X_train, Y_train, X_dev, Y_dev, gradient_descent, forwardProp, get_predictions
+from neural_network_mnist import X_train, Y_train, X_dev, Y_dev, gradient_descent, forwardProp, get_predictions
 
 #Train the network using main.py, with the same settings as main.py
 W1,b1,W2,b2,W3,b3,accuracies = gradient_descent(X_train, Y_train, 50, 0.1, 64)

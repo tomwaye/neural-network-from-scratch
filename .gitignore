@@ -1,6 +1,9 @@
 .venv/
 __pycache__/
 .DS_Store
-
+data/
 # Kaggle dataset - download it yourself (see README)
 *.csv
+
+# CIFAR-10 - downloaded automatically by neural_network_cifar10.py
+data/
